@@ -5,7 +5,7 @@ A Next.js web app that helps call centre agents improve through short daily AI-p
 ## Features
 
 - **Daily Training** — 3 practice scenarios per day, AI plays the customer, up to 5 turns each
-- **Chat & Call modes** — Text chat (Claude) or live voice call (Deepgram Voice Agent)
+- **Chat & Call modes** — Text chat (GPT-5.4 mini) or live voice call (Deepgram Voice Agent)
 - **Instant AI Scoring** — 0–100 score across Empathy, Accuracy, Resolution & Professionalism
 - **My Cases** — Browse all cases, filter by topic/channel/difficulty, create custom ones
 - **Dashboard** — Score over time, by topic, by channel, streak & session history
@@ -17,8 +17,7 @@ A Next.js web app that helps call centre agents improve through short daily AI-p
 - **TypeScript**
 - **Tailwind CSS**
 - **Deepgram Voice Agent API** — live voice call mode (WebSocket proxy)
-- **OpenAI GPT-4o-mini** — LLM backend for Deepgram voice agent
-- **Claude (claude-sonnet-4-20250514)** — chat mode & scoring
+- **OpenAI GPT-5.4 mini** (`gpt-5.4-mini`) — chat mode, scoring & LLM backend for Deepgram voice agent
 - **Recharts** — dashboard charts
 - **localStorage** — persistence (no database or auth needed)
 
@@ -42,7 +41,7 @@ OPENAI_API_KEY=...
 ```
 
 - Deepgram key: [console.deepgram.com](https://console.deepgram.com)
-- OpenAI key: [platform.openai.com](https://platform.openai.com) (used by Deepgram Voice Agent as LLM backend)
+- OpenAI key: [platform.openai.com](https://platform.openai.com)
 
 ### 3. Run locally
 
@@ -81,8 +80,8 @@ agentup/
 │   ├── cases/page.tsx           # My Cases
 │   ├── dashboard/page.tsx       # My Dashboard
 │   ├── api/
-│   │   ├── chat/route.ts        # AI customer chat endpoint (Claude)
-│   │   └── score/route.ts       # AI scoring endpoint (Claude)
+│   │   ├── chat/route.ts        # AI customer chat endpoint (GPT-5.4 mini)
+│   │   └── score/route.ts       # AI scoring endpoint (GPT-5.4 mini)
 │   ├── layout.tsx
 │   └── globals.css
 ├── components/
@@ -112,9 +111,9 @@ agentup/
 
 ## AI Behaviour
 
-- **Chat mode** (`/api/chat`): Claude plays the customer, stays in character, adjusts tone to difficulty (Beginner = polite, Advanced = adversarial).
-- **Call mode** (`/api/voice-proxy`): A WebSocket proxy connects the browser to Deepgram's Voice Agent API. The server sends scenario context and difficulty on connection, Deepgram handles STT, LLM (GPT-4o-mini), and TTS. The AI customer speaks first using the case's opening message.
-- **Score API** (`/api/score`): Claude evaluates the full transcript and returns a JSON breakdown across 4 criteria + written feedback.
+- **Chat mode** (`/api/chat`): GPT-5.4 mini plays the customer, stays in character, adjusts tone to difficulty (Beginner = polite, Advanced = adversarial).
+- **Call mode** (`/api/voice-proxy`): A WebSocket proxy connects the browser to Deepgram's Voice Agent API. The server sends scenario context and difficulty on connection, Deepgram handles STT, LLM (GPT-5.4 mini), and TTS. The AI customer speaks first using the case's opening message.
+- **Score API** (`/api/score`): GPT-5.4 mini evaluates the full transcript and returns a JSON breakdown across 4 criteria + written feedback.
 
 ## Scoring Criteria
 
@@ -129,6 +128,6 @@ agentup/
 
 | Channel | Mode |
 |---|---|
-| Chat | Text chat only (Claude) |
+| Chat | Text chat only (GPT-5.4 mini) |
 | Call | Live voice call (Deepgram) |
-| Both | Text chat (Claude) |
+| Both | Text chat (GPT-5.4 mini) |
