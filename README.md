@@ -13,11 +13,12 @@ A Next.js web app that helps call centre agents improve through short daily AI-p
 
 ## Tech Stack
 
-- **Next.js 15** (App Router) with a **custom Node.js server** (`server.ts`)
+- **Next.js 14** (App Router) with a **custom Node.js server** (`server.ts`)
 - **TypeScript**
 - **Tailwind CSS**
-- **Deepgram Voice Agent API** — live voice call mode (WebSocket)
+- **Deepgram Voice Agent API** — live voice call mode (WebSocket proxy)
 - **OpenAI GPT-4o-mini** — LLM backend for Deepgram voice agent
+- **Claude (claude-sonnet-4-20250514)** — chat mode & scoring
 - **Recharts** — dashboard charts
 - **localStorage** — persistence (no database or auth needed)
 
@@ -57,42 +58,56 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Vercel is **not supported** — the custom WebSocket server requires a persistent Node.js process.
 
-Recommended platforms:
+Recommended: **Railway**
 
-- **Railway** — `railway up` (simplest)
-- **Render** — connect GitHub repo, set start command to `npm start`
-- **Fly.io** — `fly launch` then `fly deploy`
+1. Push your repo to GitHub
+2. Create a new project on [railway.app](https://railway.app) and connect your repo
+3. Add environment variables in your service's **Variables** tab:
+   - `DEEPGRAM_API_KEY`
+   - `OPENAI_API_KEY`
+4. Railway will auto-deploy on every push to `main`
 
-Make sure to set all environment variables (`DEEPGRAM_API_KEY`, `OPENAI_API_KEY`) in your hosting platform's settings.
+Other supported platforms: **Render**, **Fly.io**, any VPS (with PM2 + Nginx).
 
 ## Project Structure
 
 ```
 agentup/
-├── server.ts                 # Custom Node.js server — Next.js + WebSocket proxy to Deepgram
+├── server.ts                    # Custom Node.js server — Next.js + WebSocket proxy to Deepgram
+├── voiceProxy.ts                # WebSocket proxy logic (browser ↔ Deepgram Voice Agent)
+├── buildDeepgramSettings.ts     # Deepgram agent config builder (scenario, difficulty, LLM)
 ├── app/
-│   ├── page.tsx              # Daily Training (home)
-│   ├── cases/page.tsx        # My Cases
-│   ├── dashboard/page.tsx    # My Dashboard
+│   ├── page.tsx                 # Daily Training (home)
+│   ├── cases/page.tsx           # My Cases
+│   ├── dashboard/page.tsx       # My Dashboard
 │   ├── api/
-│   │   ├── chat/route.ts     # AI customer chat endpoint (Claude)
-│   │   └── score/route.ts    # AI scoring endpoint (Claude)
+│   │   ├── chat/route.ts        # AI customer chat endpoint (Claude)
+│   │   └── score/route.ts       # AI scoring endpoint (Claude)
 │   ├── layout.tsx
 │   └── globals.css
 ├── components/
 │   ├── Nav.tsx
 │   ├── training/
-│   │   ├── CasePicker.tsx    # Case intro screen
-│   │   ├── ChatWindow.tsx    # Chat + Call interface
-│   │   ├── ScorePanel.tsx    # Score breakdown
-│   │   └── SessionSummary.tsx
+│   │   ├── CasePicker.tsx       # Case intro screen
+│   │   └── ChatWindow/
+│   │       ├── ChatWindow.tsx   # Chat + Call interface
+│   │       ├── CallWindow.tsx   # Voice call UI
+│   │       ├── ChatInput.tsx
+│   │       ├── ChatMessages.tsx
+│   │       ├── ScorePanel.tsx   # Score breakdown
+│   │       ├── SessionProgress.tsx
+│   │       ├── SessionSummary.tsx
+│   │       └── StatusPill.tsx
 │   └── ui/
 │       ├── DifficultyBadge.tsx
 │       └── TopicBadge.tsx
+├── hooks/
+│   ├── useDeepgramCall.tsx      # Voice call hook (WebSocket + audio)
+│   └── useTrainingSession.tsx   # Training session state machine
 └── lib/
-    ├── types.ts              # TypeScript types
-    ├── cases.ts              # Default cases data
-    └── storage.ts            # localStorage helpers & stats
+    ├── types.ts                 # TypeScript types
+    ├── cases.ts                 # Default cases data
+    └── storage.ts               # localStorage helpers & stats
 ```
 
 ## AI Behaviour
